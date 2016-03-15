@@ -12,7 +12,7 @@ const gulp = require("gulp");
 const sequence = require("run-sequence").use(gulp);
 const buildSteps = require("./javascript-build-essentials/build/shared-gulpfile");
 
-const outputDirectory = "./release/components/";
+const outputDirectory = "./foo/to/the/bar/";
 
 gulp.task("typescript", () => buildSteps.createTypeScriptTask([ "./**/*.ts" ], outputDirectory));
 gulp.task("jade", () => buildSteps.createJadeTask([ "./**/*.jade" ], outputDirectory));
