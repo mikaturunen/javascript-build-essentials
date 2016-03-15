@@ -1,8 +1,11 @@
 # Example use
 
-Using `shared-gulpfile.js` as the common build source from your own gulpfile.js. Please note that the example assumes you've installed this repository as a sub-repo to your own. You can install it with NPM or just copy everything over. Whatever works for your workflow.
+Using `shared-gulpfile.js` as the common build source from your own `gulpfile.js`. Please note that the example assumes you've installed this repository as a sub-repo to your own. You can install it with NPM or just copy everything over. Whatever works for your workflow.
 
 ```js
+// ES6 specific example.
+// Just think of all the 'const' definitions as 'var' and the '() => ' as 'function() {}'
+
 "use strict";
 
 const gulp = require("gulp");
