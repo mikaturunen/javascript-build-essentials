@@ -32,7 +32,7 @@ Above example compiles Typescript files, Jade files and LESS files into given ou
 Commands to run:
 
 ```
-npm istall gulp gulp-sequence gulp-cli --save-dev
+npm istall gulp run-sequence gulp-cli --save-dev
 cd javascript-build-essentials && npm install && cd ..
 gulp
 ```
