@@ -1,17 +1,17 @@
 # Example use
 
-Using `shared-gulpfile.js` as the common build source:
+Using `shared-gulpfile.js` as the common build source from your own gulpfile.js. Please note that the example assumes you've installed this repository as a sub-repo to your own. You can install it with NPM or just copy everything over. Whatever works for your workflow.
 
 ```js
 "use strict";
 
 const gulp = require("gulp");
 const sequence = require("run-sequence").use(gulp);
-const buildSteps = require("./shared-gulpfile");
+const buildSteps = require("./javascript-build-essentials/build/shared-gulpfile");
 
 const outputDirectory = "./release/components/";
 
-gulp.task("typescript", () => buildSteps.createTypeScriptTask([ "./types/**/*.d.ts", "./library/**/*.ts" ], outputDirectory));
+gulp.task("typescript", () => buildSteps.createTypeScriptTask([ "./**/*.ts" ], outputDirectory));
 gulp.task("jade", () => buildSteps.createJadeTask([ "./**/*.jade" ], outputDirectory));
 gulp.task("less", () => buildSteps.createLessTask([ "./**/*.less" ], outputDirectory));
 
