@@ -1,2 +1,3 @@
-# typescript-build-essentials
-Repository for build tool chain essentials I commonly use in projects I work. From typedefinitions to shared gulpfiles and everything in between.
+# Javascript build essentials
+
+In this repository you can find some build essentials I've come to use quite a bit. They relate to compiling Jade, Less and TypeScript with Gulp and in general the typings of different framework based stack solutions.
