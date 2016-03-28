@@ -1,5 +1,5 @@
 {
-  "name": "gulp-build",
+  "name": "javascript-build-essentials",
   "description": "Gulp based build chain for Typescript, LESS and Jade.",
   "version": "1.0.0",
   "main": "",
