@@ -1,11 +1,10 @@
 /**
  * Common build actions that can be shared between applications fairly easily.
- * Brings in TypeScript compilation, Jade compilation and LESS compilation. 
+ * Brings in TypeScript compilation, Jade compilation and LESS compilation.
  */
 
 "use strict";
 
-const gulp = require("gulp");
 const ts = require("gulp-typescript");
 const eventStream = require("event-stream");
 const tslint = require("gulp-tslint");
@@ -20,95 +19,102 @@ const combiner = require("stream-combiner2");
 // in all other cases but 'watch' as 'watch' is ongoing, iterating, always on process :)
 let globalEmit = false;
 
-module.exports = {
-	/**
-	 * Turns off emitting. Needs to be set off during watch operations. During watch operation we do not allow
-	 * the build to fail on emited errors. So blocking emits.
-	 */
-	globalEmitOff: () => globalEmit = false,
+const sharedGulp = () => {
+	return {
+		/**
+		 * Turns off emitting. Needs to be set off during watch operations. During watch operation we do not allow
+		 * the build to fail on emited errors. So blocking emits.
+		 */
+		globalEmitOff: () => globalEmit = false,
 
-	/**
-	 * Turns on emitting. Needs to be set on during normal build actions so that the build fails on errors.
-	 */
-	globalEmitOn: () => globalEmit = true,
+		/**
+		 * Turns on emitting. Needs to be set on during normal build actions so that the build fails on errors.
+		 */
+		globalEmitOn: () => globalEmit = true,
 
-	/**
-	 * Creates TypeScript compilation for given sources files and outputs them into a preferred release location.
-	 * Used for frontend and backend TypeScript. They need different compilation locations.
-	 * @param {String[]} sources Array of source files
-	 * @param {String} outputDirectory Location to output the JS files to.
-	 * @param {Object} options Typescript options file. Accepts common typescript flags.
-	 * @returns {Object} Gulp stream.
-	 */
-	createTypeScriptTask: (sources, outputDirectory, options) => {
-	    const tsOptions = options | {
-	        typescript: require("typescript"),
-	        target: "es6",
-	        sourceMap: true,
-	        removeComments: false,
-	        declaration: true,
-	        noImplicitAny: true,
-	        module: "es2015",
-	        failOnTypeErrors: true,
-	        suppressImplicitAnyIndexErrors: true
-	    };
+		/**
+		 * Creates TypeScript compilation for given sources files and outputs them into a preferred release location.
+		 * Used for frontend and backend TypeScript. They need different compilation locations.
+		 * @param {Object} gulp Gulp object.
+		 * @param {String[]} sources Array of source files
+		 * @param {String} outputDirectory Location to output the JS files to.
+		 * @param {Object} options Typescript options file. Accepts common typescript flags.
+		 * @returns {Object} Gulp stream.
+		 */
+		createTypeScriptTask: (gulp, sources, outputDirectory, options) => {
+		    const tsOptions = options | {
+		        typescript: require("typescript"),
+		        target: "es6",
+		        sourceMap: true,
+		        removeComments: false,
+		        declaration: true,
+		        noImplicitAny: true,
+		        module: "es2015",
+		        failOnTypeErrors: true,
+		        suppressImplicitAnyIndexErrors: true
+		    };
 
-	    return gulp
-	        .src(sources)
-	        // Pipe source to lint
-	        .pipe(tslint())
-	        .pipe(tslint.report("verbose", { emitError: globalEmit }))
-	        // Push through to compiler
-	        .pipe(ts(tsOptions))
-	        // Through babel (es6->es5)
-	        .pipe(babel())
-	        .pipe(gulp.dest(outputDirectory));
-	},
+		    return gulp
+		        .src(sources)
+		        // Pipe source to lint
+		        .pipe(tslint())
+		        .pipe(tslint.report("verbose", { emitError: globalEmit }))
+		        // Push through to compiler
+		        .pipe(ts(tsOptions))
+		        // Through babel (es6->es5)
+		        .pipe(babel())
+		        .pipe(gulp.dest(outputDirectory));
+		},
 
-	/**
-	 * Creates Jade compilation for given sources files and outputs them into a preferred release location.
-	 * @param {String[]} sources Array of source files
-	 * @param {String} outputDirectory Location to output the HTML files to.
-	 * @param {Object} options Jade options file. Accepts common jade flags.
-	 * @returns {Object} Gulp stream.
-	 */
-	createJadeTask: (sources, outputDirectory, options) => {
-		const jadeOptions = options | {
-			pretty: true
-		};
-		const j = jade();
+		/**
+		 * Creates Jade compilation for given sources files and outputs them into a preferred release location.
+		 * @param {Object} gulp Gulp object.
+		 * @param {String[]} sources Array of source files
+		 * @param {String} outputDirectory Location to output the HTML files to.
+		 * @param {Object} options Jade options file. Accepts common jade flags.
+		 * @returns {Object} Gulp stream.
+		 */
+		createJadeTask: (gulp, sources, outputDirectory, options) => {
+			const jadeOptions = options | {
+				pretty: true
+			};
+			const j = jade();
 
-	    if(globalEmit === false) {
-	        j.on('error', notify.onError(error => {
-	            return 'An error occurred while compiling Jade.\nLook in the console for details.\n' + error;
-	        }));
-	    }
+		    if(globalEmit === false) {
+		        j.on('error', notify.onError(error => {
+		            return 'An error occurred while compiling Jade.\nLook in the console for details.\n' + error;
+		        }));
+		    }
 
-	    return gulp.src(sources)
-	        .pipe(j)
-	        .pipe(gulp.dest(outputDirectory));
-	},
+		    return gulp.src(sources)
+		        .pipe(j)
+		        .pipe(gulp.dest(outputDirectory));
+		},
 
-	/**
-	 * Creates LESS compilation for given sources files and outputs them into a preferred release location.
-	 * @param {String[]} sources Array of source files
-	 * @param {String} outputDirectory Location to output the CSS files to.
-	 * @param {Object} options Jade options file. Accepts common jade flags.
-	 * @returns {Object} Gulp stream.
-	 */
-	createLessTask: (sources, outputDirectory, options) => {
-		const combined = combiner.obj([
-	        gulp.src(sources),
-	        less(),
-	        gulp.dest(outputDirectory)
-	    ]);
+		/**
+		 * Creates LESS compilation for given sources files and outputs them into a preferred release location.
+		 * @param {Object} gulp Gulp object.
+		 * @param {String[]} sources Array of source files
+		 * @param {String} outputDirectory Location to output the CSS files to.
+		 * @param {Object} options Jade options file. Accepts common jade flags.
+		 * @returns {Object} Gulp stream.
+		 */
+		createLessTask: (gulp, sources, outputDirectory, options) => {
+			const combined = combiner.obj([
+		        gulp.src(sources),
+		        less(),
+		        gulp.dest(outputDirectory)
+		    ]);
 
-	    if (globalEmit === false) {
-	        combined.on("error", notify.onError(error => {
-	            return 'An error occurred while compiling Less.\nLook in the console for details.\n' + error;
-	        }))
-	    }
+		    if (globalEmit === false) {
+		        combined.on("error", notify.onError(error => {
+		            return 'An error occurred while compiling Less.\nLook in the console for details.\n' + error;
+		        }))
+		    }
 
-	    return combined;
+		    return combined;
+		}
 	}
-};
+}
+
+module.exports = sharedGulp;
