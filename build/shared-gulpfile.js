@@ -67,6 +67,39 @@ const sharedGulp = (gulp) => {
 		 */
 		globalEmitOn: () => globalEmit = true,
 
+		createBabelTask: (sources, outputDirectory, options) => {
+			const babelOptions = createOptions(options, { });
+			const isAngularProject = babelOptions.angular;
+			const isConcatEnabled = babelOptions.concat;
+			const isUglifyEnabled = babelOptions.uglify;
+
+			// Making sure the provided values do not interfere with any of the tools we pass the options to
+			delete babelOptions.angular;
+			delete babelOptions.concat;
+			delete babelOptions.uglify;
+
+			// Execute streams
+		    let stream = gulp.src(sources);
+			stream = stream.pipe(babel(babelOptions));
+
+			if (isAngularProject === true) {
+				stream = stream.pipe(ngAnnotate());
+			}
+
+			if (isConcatEnabled === true) {
+				stream = stream.pipe(concat("app.js"));
+			}
+
+			if (isUglifyEnabled === true) {
+				const ugly = uglify();
+				ugly.on("error", (message) => console.log(message));
+				stream = stream.pipe(ugly);
+			}
+
+			console.log("output to:", outputDirectory);
+			return stream.pipe(gulp.dest(outputDirectory));
+		},
+
 		/**
 		 * Creates TypeScript compilation for given sources files and outputs them into a preferred release location.
 		 * Used for frontend and backend TypeScript.
@@ -78,29 +111,45 @@ const sharedGulp = (gulp) => {
 		createPlainTypeScriptTask: (sources, outputDirectory, options) => {
 			const tsOptions = createOptions(options, typeScriptOptions);
 
+			const isTsLintEnabled = tsOptions.tslint;
+			const isAngularProject = tsOptions.angular;
+			const isConcatEnabled = tsOptions.concat;
+			const isUglifyEnabled = tsOptions.uglify;
+			const tsLintOptions = tsOptions.tslintOptions;
+
+			// Making sure the provided values do not interfere with any of the tools we pass the options to
+			delete tsOptions.tslint;
+			delete tsOptions.angular;
+			delete tsOptions.concat;
+			delete tsOptions.uglify;
+			delete tsOptions.tslintOptions;
+
 			// Execute streams
-		    let stream = gulp
-		        .src(sources)
-		        // Pipe source to lint
-		        .pipe(tslint())
-		        .pipe(tslint.report("verbose", { emitError: globalEmit }))
-		        // Push through to compiler
-		        .pipe(ts(tsOptions))
+		    let stream = gulp.src(sources);
+
+			if (isTsLintEnabled === true) {
+				stream = stream.pipe(tslint(tsLintOptions))
+		        	.pipe(tslint.report("verbose", { emitError: globalEmit }))
+			}
+
+			// Push through to compiler
+			stream = stream.pipe(ts(tsOptions))
 		        // Through babel (es6->es5)
 		        .pipe(babel());
 
-			if (tsOptions.angular === true) {
+			if (isAngularProject === true) {
 				stream = stream.pipe(ngAnnotate());
 			}
 
-			if (tsOptions.concat === true) {
+			if (isConcatEnabled === true) {
 				stream = stream.pipe(concat("app.js"));
 			}
 
-			if (tsOptions.uglify === true) {
+			if (isUglifyEnabled === true) {
 				stream = stream.pipe(uglify());
 			}
 
+			console.log("output to:", outputDirectory);
 			return stream.pipe(gulp.dest(outputDirectory));
 		},
 
@@ -113,7 +162,7 @@ const sharedGulp = (gulp) => {
 		 * @param {Object} options Typescript options file. Accepts common typescript flags.
 		 * @returns {Object} Gulp stream.
 		 */
-		createAngularTypeScriptTask: (sources, outputDirectory, options) => {
+		createAngularTypeScriptTask: function(sources, outputDirectory, options) {
 			options.angular = true;
 			return this.createPlainTypeScriptTask(sources, outputDirectory, options);
 		},
