@@ -15,7 +15,8 @@ const notify = require("gulp-notify");
 const less = require("gulp-less");
 const less = require("gulp-uglify");
 const combiner = require("stream-combiner2");
-const _ = require("lodash");
+const ngAnnotate = require('gulp-ng-annotate');
+
 
 // Used to stop the 'watch' behavior from breaking on emited errors, errors should stop the process
 // in all other cases but 'watch' as 'watch' is ongoing, iterating, always on process :)
@@ -82,6 +83,14 @@ const sharedGulp = () => {
 		        // Through babel (es6->es5)
 		        .pipe(babel());
 
+			if (tsOptions.angular === true) {
+				stream = stream.pipe(ngAnnotate());
+			}
+
+			if (tsOptions.concat === true) {
+
+			}
+
 			if (tsOptions.uglify === true) {
 
 			}
@@ -100,19 +109,8 @@ const sharedGulp = () => {
 		 * @returns {Object} Gulp stream.
 		 */
 		createAngularTypeScriptTask: (gulp, sources, outputDirectory, options) => {
-			const tsOptions = createOptions(options, typeScriptOptions);
-
-			// Execute streams
-			return gulp
-				.src(sources)
-				// Pipe source to lint
-				.pipe(tslint())
-				.pipe(tslint.report("verbose", { emitError: globalEmit }))
-				// Push through to compiler
-				.pipe(ts(tsOptions))
-				// Through babel (es6->es5)
-				.pipe(babel())
-				.pipe(gulp.dest(outputDirectory));
+			options.angular = true;
+			return this.createPlainTypeScriptTask(gulp, sources, outputDirectory, options);
 		},
 
 		/**
