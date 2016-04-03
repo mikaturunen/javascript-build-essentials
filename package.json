@@ -17,8 +17,8 @@
     "url": "https://github.com/mikaturunen/javascript-build-essentials/issues"
   },
   "engines": {
-    "node": ">=5.6.0",
-    "npm": ">=3.7.3"
+    "node": ">=4.0.0",
+    "npm": ">=3.0.0"
   },
   "homepage": "https://github.com/mikaturunen/javascript-build-essentials",
   "devDependencies": {
