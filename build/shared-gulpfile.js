@@ -16,6 +16,7 @@ const less = require("gulp-less");
 const less = require("gulp-uglify");
 const combiner = require("stream-combiner2");
 const ngAnnotate = require('gulp-ng-annotate');
+const concat = require("gulp-concat");
 
 
 // Used to stop the 'watch' behavior from breaking on emited errors, errors should stop the process
@@ -88,11 +89,11 @@ const sharedGulp = () => {
 			}
 
 			if (tsOptions.concat === true) {
-
+				stream = stream.pipe(concat("app.js"));
 			}
 
 			if (tsOptions.uglify === true) {
-
+				stream = stream.pipe(uglify());
 			}
 
 			return stream.pipe(gulp.dest(outputDirectory));
