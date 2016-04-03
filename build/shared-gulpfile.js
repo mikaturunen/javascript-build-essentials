@@ -48,7 +48,13 @@ const createOptions = (userOptions, defaults) => {
 	return options;
 };
 
-const sharedGulp = () => {
+/**
+ * Creates the shared gulp build tasks with shared gulp.
+ *
+ * @param {Object} gulp Gulp object.
+ * @returns {Object} Gulp Object with build functions.
+ */
+const sharedGulp = (gulp) => {
 	return {
 		/**
 		 * Turns off emitting. Needs to be set off during watch operations. During watch operation we do not allow
@@ -64,13 +70,12 @@ const sharedGulp = () => {
 		/**
 		 * Creates TypeScript compilation for given sources files and outputs them into a preferred release location.
 		 * Used for frontend and backend TypeScript.
-		 * @param {Object} gulp Gulp object.
 		 * @param {String[]} sources Array of source files
 		 * @param {String} outputDirectory Location to output the JS files to.
 		 * @param {Object} options Typescript options file. Accepts common typescript flags.
 		 * @returns {Object} Gulp stream.
 		 */
-		createPlainTypeScriptTask: (gulp, sources, outputDirectory, options) => {
+		createPlainTypeScriptTask: (sources, outputDirectory, options) => {
 			const tsOptions = createOptions(options, typeScriptOptions);
 
 			// Execute streams
@@ -103,26 +108,24 @@ const sharedGulp = () => {
 		 * Creates TypeScript compilation for given sources files and outputs them into a preferred release location.
 		 * Used for frontend TypeScript. Specific compilation task for Angular projects, heavily leans on
 		 * ngAnnotate and ngTemplates.
-		 * @param {Object} gulp Gulp object.
 		 * @param {String[]} sources Array of source files
 		 * @param {String} outputDirectory Location to output the JS files to.
 		 * @param {Object} options Typescript options file. Accepts common typescript flags.
 		 * @returns {Object} Gulp stream.
 		 */
-		createAngularTypeScriptTask: (gulp, sources, outputDirectory, options) => {
+		createAngularTypeScriptTask: (sources, outputDirectory, options) => {
 			options.angular = true;
-			return this.createPlainTypeScriptTask(gulp, sources, outputDirectory, options);
+			return this.createPlainTypeScriptTask(sources, outputDirectory, options);
 		},
 
 		/**
 		 * Creates Jade compilation for given sources files and outputs them into a preferred release location.
-		 * @param {Object} gulp Gulp object.
 		 * @param {String[]} sources Array of source files
 		 * @param {String} outputDirectory Location to output the HTML files to.
 		 * @param {Object} options Jade options file. Accepts common jade flags.
 		 * @returns {Object} Gulp stream.
 		 */
-		createJadeTask: (gulp, sources, outputDirectory, options) => {
+		createJadeTask: (sources, outputDirectory, options) => {
 			const jadeOptions = createOptions(options, { pretty: true });
 			const j = jade();
 
@@ -141,13 +144,12 @@ const sharedGulp = () => {
 
 		/**
 		 * Creates LESS compilation for given sources files and outputs them into a preferred release location.
-		 * @param {Object} gulp Gulp object.
 		 * @param {String[]} sources Array of source files
 		 * @param {String} outputDirectory Location to output the CSS files to.
 		 * @param {Object} options Jade options file. Accepts common jade flags.
 		 * @returns {Object} Gulp stream.
 		 */
-		createLessTask: (gulp, sources, outputDirectory, options) => {
+		createLessTask: (sources, outputDirectory, options) => {
 			const combined = combiner.obj([
 		        gulp.src(sources),
 		        less(options),
