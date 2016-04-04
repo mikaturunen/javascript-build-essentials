@@ -2,7 +2,23 @@
 
 Using `shared-gulpfile.js` as the common build source from your own `gulpfile.js`. Please note that the example assumes you've installed this repository as a sub-repo to your own. You can install it with NPM or just copy everything over. Whatever works for your workflow.
 
-Gulpfile content:
+First: 
+
+```
+npm install javascript-build-essentials --save
+npm install --save-dev babel-preset-es2015
+```
+
+Create file `.babelrc` with content in the root of project:
+
+```
+{
+    "presets": [ "es2015" ]
+}
+```
+
+
+Gulpfile.js content:
 
 ```js
 // ES6 specific example.
@@ -12,11 +28,13 @@ Gulpfile content:
 
 const gulp = require("gulp");
 const sequence = require("run-sequence").use(gulp);
-const buildSteps = require("./javascript-build-essentials/build/shared-gulpfile");
+const buildSteps = require("./node_modules/javascript-build-essentials/build/shared-gulpfile");
 
+// Creating shared build steps closure for use, passing in the local gulp.
+const build = buildSteps(gulp);
 const outputDirectory = "./foo/to/the/bar/";
 
-gulp.task("typescript", () => buildSteps.createTypeScriptTask([ "./**/*.ts" ], outputDirectory));
+gulp.task("typescript", () => buildSteps.createPlainTypeScriptTask([ "./**/*.ts" ], outputDirectory));
 gulp.task("jade", () => buildSteps.createJadeTask([ "./**/*.jade" ], outputDirectory));
 gulp.task("less", () => buildSteps.createLessTask([ "./**/*.less" ], outputDirectory));
 
@@ -27,14 +45,3 @@ gulp.task("default", () => {
 
 ```
 Above example compiles Typescript files, Jade files and LESS files into given output directories.
-
-
-Commands to run:
-
-```
-npm istall gulp run-sequence gulp-cli --save-dev
-cd javascript-build-essentials && npm install && cd ..
-gulp
-```
-
-Obviously if you install this repository with `npm install <repo>`, you do not need to manually do the npm install for `javascript-build-essentials` and can directly just run gulp.
