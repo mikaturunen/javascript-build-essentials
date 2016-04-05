@@ -34,12 +34,12 @@ const buildSteps = require("./node_modules/javascript-build-essentials/build/sha
 const build = buildSteps(gulp);
 const outputDirectory = "./foo/to/the/bar/";
 
-gulp.task("typescript", () => buildSteps.createPlainTypeScriptTask([ "./**/*.ts" ], outputDirectory));
-gulp.task("jade", () => buildSteps.createJadeTask([ "./**/*.jade" ], outputDirectory));
-gulp.task("less", () => buildSteps.createLessTask([ "./**/*.less" ], outputDirectory));
+gulp.task("typescript", () => build.createPlainTypeScriptTask([ "./**/*.ts" ], outputDirectory));
+gulp.task("jade", () => build.createJadeTask([ "./**/*.jade" ], outputDirectory));
+gulp.task("less", () => build.createLessTask([ "./**/*.less" ], outputDirectory));
 
 gulp.task("default", () => {
-    buildSteps.globalEmitOn();
+    build.globalEmitOn();
     return sequence([ "typescript", "jade", "less" ]);
 });
 
