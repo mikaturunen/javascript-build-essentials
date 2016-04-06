@@ -15,9 +15,10 @@ const notify = require("gulp-notify");
 const less = require("gulp-less");
 const uglify = require("gulp-uglify");
 const combiner = require("stream-combiner2");
-const ngAnnotate = require('gulp-ng-annotate');
+const ngAnnotate = require("gulp-ng-annotate");
 const concat = require("gulp-concat");
-
+const angularTemplates = require("gulp-ng-template");
+const minifyHtml = require("gulp-minify-html")
 
 // Used to stop the 'watch' behavior from breaking on emited errors, errors should stop the process
 // in all other cases but 'watch' as 'watch' is ongoing, iterating, always on process :)
@@ -35,6 +36,17 @@ let typeScriptOptions = {
 	suppressImplicitAnyIndexErrors: true
 };
 
+const minifyHtmlOptions = {
+	empty: true,
+	quotes: true
+};
+
+/**
+ * Creates a new options Object and makes sure the existing ones are not touched.
+ * @param {Object} userOptions User specified options.
+ * @param {Object} default Default values for given options.
+ * @returns {Object} New options object built from defaults and user provided options.
+ */
 const createOptions = (userOptions, defaults) => {
 	// Make copy and keep the original unaltered
 	let options = Object.keys(defaults).map(k => defaults[k]);
@@ -67,6 +79,28 @@ const sharedGulp = (gulp) => {
 		 */
 		globalEmitOn: () => globalEmit = true,
 
+		/**
+		 * Creates specific Angular ngTemplates task that combines the angular specific ui-router templateUrl html files
+		 * into $templateCache so that they are actually never queried from the backend but instead instantly loaded from the front.
+		 * @param {String[]} sources Array of source files
+		 * @param {String} outputDirectory Location to output the JS file to.
+		 * @param {Object} options Options for gulp-ng-templates options file.
+		 * @returns {Object} Gulp stream.
+		 */
+		createAngularTemplateTask: (sources, outputDirectory, options) => {
+			return gulp.src(sources)
+		   		.pipe(minifyHtml(minifyHtmlOptions))
+	           .pipe(angularTemplates(options))
+	           .pipe(gulp.dest(outputDirectory));
+		},
+
+		/**
+		 * Simplified Angular and Babel use case. Creates a angular compatible babel combilation stream.
+		 * @param {String[]} sources Array of source files
+		 * @param {String} outputDirectory Location to output the JS files to.
+		 * @param {Object} options.
+		 * @returns {Object} Gulp stream.
+		 */
 		createBabelTask: (sources, outputDirectory, options) => {
 			const babelOptions = createOptions(options, { });
 			const isAngularProject = babelOptions.angular;
