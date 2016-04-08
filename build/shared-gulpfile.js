@@ -130,7 +130,6 @@ const sharedGulp = (gulp) => {
 				stream = stream.pipe(ugly);
 			}
 
-			console.log("output to:", outputDirectory);
 			return stream.pipe(gulp.dest(outputDirectory));
 		},
 
