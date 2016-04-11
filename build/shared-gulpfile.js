@@ -5,26 +5,26 @@
 
 "use strict";
 
-const ts = require("gulp-typescript");
-const eventStream = require("event-stream");
-const tslint = require("gulp-tslint");
-const babel = require("gulp-babel");
-const path = require("path");
-const jade = require("gulp-jade");
-const notify = require("gulp-notify");
-const less = require("gulp-less");
-const uglify = require("gulp-uglify");
-const combiner = require("stream-combiner2");
-const ngAnnotate = require("gulp-ng-annotate");
-const concat = require("gulp-concat");
-const angularTemplates = require("gulp-ng-template");
-const minifyHtml = require("gulp-minify-html")
+var ts = require("gulp-typescript");
+var eventStream = require("event-stream");
+var tslint = require("gulp-tslint");
+var babel = require("gulp-babel");
+var path = require("path");
+var jade = require("gulp-jade");
+var notify = require("gulp-notify");
+var less = require("gulp-less");
+var uglify = require("gulp-uglify");
+var combiner = require("stream-combiner2");
+var ngAnnotate = require("gulp-ng-annotate");
+var concat = require("gulp-concat");
+var angularTemplates = require("gulp-ng-template");
+var minifyHtml = require("gulp-minify-html")
 
 // Used to stop the 'watch' behavior from breaking on emited errors, errors should stop the process
 // in all other cases but 'watch' as 'watch' is ongoing, iterating, always on process :)
-let globalEmit = false;
+var globalEmit = false;
 
-let typeScriptOptions = {
+var typeScriptOptions = {
 	typescript: require("typescript"),
 	target: "es6",
 	sourceMap: true,
@@ -36,7 +36,7 @@ let typeScriptOptions = {
 	suppressImplicitAnyIndexErrors: true
 };
 
-const minifyHtmlOptions = {
+var minifyHtmlOptions = {
 	empty: true,
 	quotes: true
 };
@@ -47,16 +47,16 @@ const minifyHtmlOptions = {
  * @param {Object} default Default values for given options.
  * @returns {Object} New options object built from defaults and user provided options.
  */
-const createOptions = (userOptions, defaults) => {
+var createOptions = function (userOptions, defaults) {
 	// Make copy and keep the original unaltered
-	let options = Object.keys(defaults).map(k => defaults[k]);
+	var options = Object.keys(defaults).map(function(k) { return defaults[k]; });
 
 	if (!userOptions) {
 		return options;
 	}
 
 	// Update the newly created options with the user values
-	Object.keys(userOptions).forEach(k => options[k] = userOptions[k]);
+	Object.keys(userOptions).forEach(function(k) { options[k] = userOptions[k]; });
 	return options;
 };
 
@@ -66,18 +66,18 @@ const createOptions = (userOptions, defaults) => {
  * @param {Object} gulp Gulp object.
  * @returns {Object} Gulp Object with build functions.
  */
-const sharedGulp = (gulp) => {
+var sharedGulp = function(gulp) {
 	return {
 		/**
 		 * Turns off emitting. Needs to be set off during watch operations. During watch operation we do not allow
 		 * the build to fail on emited errors. So blocking emits.
 		 */
-		globalEmitOff: () => globalEmit = false,
+		globalEmitOff: function() { globalEmit = false; },
 
 		/**
 		 * Turns on emitting. Needs to be set on during normal build actions so that the build fails on errors.
 		 */
-		globalEmitOn: () => globalEmit = true,
+		globalEmitOn: function() { globalEmit = true; },
 
 		/**
 		 * Creates specific Angular ngTemplates task that combines the angular specific ui-router templateUrl html files
@@ -87,7 +87,7 @@ const sharedGulp = (gulp) => {
 		 * @param {Object} options Options for gulp-ng-templates options file.
 		 * @returns {Object} Gulp stream.
 		 */
-		createAngularTemplateTask: (sources, outputDirectory, options) => {
+		createAngularTemplateTask: function (sources, outputDirectory, options) {
 			return gulp.src(sources)
 		   		.pipe(minifyHtml(minifyHtmlOptions))
 	           .pipe(angularTemplates(options))
@@ -101,19 +101,19 @@ const sharedGulp = (gulp) => {
 		 * @param {Object} options.
 		 * @returns {Object} Gulp stream.
 		 */
-		createBabelTask: (sources, outputDirectory, options) => {
-			const babelOptions = createOptions(options, { });
-			const isAngularProject = babelOptions.angular;
-			const isConcatEnabled = babelOptions.concat;
-			const isUglifyEnabled = babelOptions.uglify;
+		createBabelTask: function (sources, outputDirectory, options) {
+			var babelOptions = createOptions(options, { });
+			var isAngularProject = babelOptions.angular;
+			var isConcatEnabled = babelOptions.concat;
+			var isUglifyEnabled = babelOptions.uglify;
 
 			// Making sure the provided values do not interfere with any of the tools we pass the options to
-			delete babelOptions.angular;
-			delete babelOptions.concat;
-			delete babelOptions.uglify;
+			devare babelOptions.angular;
+			devare babelOptions.concat;
+			devare babelOptions.uglify;
 
 			// Execute streams
-		    let stream = gulp.src(sources);
+		    var stream = gulp.src(sources);
 			stream = stream.pipe(babel(babelOptions));
 
 			if (isAngularProject === true) {
@@ -125,8 +125,8 @@ const sharedGulp = (gulp) => {
 			}
 
 			if (isUglifyEnabled === true) {
-				const ugly = uglify();
-				ugly.on("error", (message) => console.log(message));
+				var ugly = uglify();
+				ugly.on("error", function(message) { console.log(message); });
 				stream = stream.pipe(ugly);
 			}
 
@@ -141,24 +141,24 @@ const sharedGulp = (gulp) => {
 		 * @param {Object} options Typescript options file. Accepts common typescript flags.
 		 * @returns {Object} Gulp stream.
 		 */
-		createPlainTypeScriptTask: (sources, outputDirectory, options) => {
-			const tsOptions = createOptions(options, typeScriptOptions);
+		createPlainTypeScriptTask: function(sources, outputDirectory, options) {
+			var tsOptions = createOptions(options, typeScriptOptions);
 
-			const isTsLintEnabled = tsOptions.tslint;
-			const isAngularProject = tsOptions.angular;
-			const isConcatEnabled = tsOptions.concat;
-			const isUglifyEnabled = tsOptions.uglify;
-			const tsLintOptions = tsOptions.tslintOptions;
+			var isTsLintEnabled = tsOptions.tslint;
+			var isAngularProject = tsOptions.angular;
+			var isConcatEnabled = tsOptions.concat;
+			var isUglifyEnabled = tsOptions.uglify;
+			var tsLintOptions = tsOptions.tslintOptions;
 
 			// Making sure the provided values do not interfere with any of the tools we pass the options to
-			delete tsOptions.tslint;
-			delete tsOptions.angular;
-			delete tsOptions.concat;
-			delete tsOptions.uglify;
-			delete tsOptions.tslintOptions;
+			devare tsOptions.tslint;
+			devare tsOptions.angular;
+			devare tsOptions.concat;
+			devare tsOptions.uglify;
+			devare tsOptions.tslintOptions;
 
 			// Execute streams
-		    let stream = gulp.src(sources);
+		    var stream = gulp.src(sources);
 
 			if (isTsLintEnabled === true) {
 				stream = stream.pipe(tslint(tsLintOptions))
@@ -207,14 +207,14 @@ const sharedGulp = (gulp) => {
 		 * @param {Object} options Jade options file. Accepts common jade flags.
 		 * @returns {Object} Gulp stream.
 		 */
-		createJadeTask: (sources, outputDirectory, options) => {
-			const jadeOptions = createOptions(options, { pretty: true });
-			const j = jade();
+		createJadeTask: function (sources, outputDirectory, options) {
+			var jadeOptions = createOptions(options, { pretty: true });
+			var j = jade();
 
 			// Depending on the global emit state we either allow the jade compiler to stop the execution on error or not,
 			// when we are running in "watch" state we do not want it to stop as it stops the watch process
 		    if(globalEmit === false) {
-		        j.on('error', notify.onError(error => {
+		        j.on('error', notify.onError(function (error) {
 		            return 'An error occurred while compiling Jade.\nLook in the console for details.\n' + error;
 		        }));
 		    }
@@ -231,15 +231,15 @@ const sharedGulp = (gulp) => {
 		 * @param {Object} options Jade options file. Accepts common jade flags.
 		 * @returns {Object} Gulp stream.
 		 */
-		createLessTask: (sources, outputDirectory, options) => {
-			const combined = combiner.obj([
+		createLessTask: function (sources, outputDirectory, options) {
+			var combined = combiner.obj([
 		        gulp.src(sources),
 		        less(options),
 		        gulp.dest(outputDirectory)
 		    ]);
 
 		    if (globalEmit === false) {
-		        combined.on("error", notify.onError(error => {
+		        combined.on("error", notify.onError(function (error) {
 		            return 'An error occurred while compiling Less.\nLook in the console for details.\n' + error;
 		        }))
 		    }
