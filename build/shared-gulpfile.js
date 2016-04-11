@@ -108,9 +108,9 @@ var sharedGulp = function(gulp) {
 			var isUglifyEnabled = babelOptions.uglify;
 
 			// Making sure the provided values do not interfere with any of the tools we pass the options to
-			devare babelOptions.angular;
-			devare babelOptions.concat;
-			devare babelOptions.uglify;
+			delete babelOptions.angular;
+			delete babelOptions.concat;
+			delete babelOptions.uglify;
 
 			// Execute streams
 		    var stream = gulp.src(sources);
@@ -151,11 +151,11 @@ var sharedGulp = function(gulp) {
 			var tsLintOptions = tsOptions.tslintOptions;
 
 			// Making sure the provided values do not interfere with any of the tools we pass the options to
-			devare tsOptions.tslint;
-			devare tsOptions.angular;
-			devare tsOptions.concat;
-			devare tsOptions.uglify;
-			devare tsOptions.tslintOptions;
+			delete tsOptions.tslint;
+			delete tsOptions.angular;
+			delete tsOptions.concat;
+			delete tsOptions.uglify;
+			delete tsOptions.tslintOptions;
 
 			// Execute streams
 		    var stream = gulp.src(sources);
